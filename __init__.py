@@ -36,10 +36,25 @@ class ExtendedPluginClass(PluginClass):
             
             return {'msg': 'Se agregó la tarea a la fila de procesamientos'}, 201
         
+        @self.route('/anomgenerate', methods=['POST'])
+        @jwt_required()
+        def anomgenerate():
+            current_user = get_jwt_identity()
+            body = request.get_json()
+
+            if 'post_type' not in body:
+                return {'msg': 'No se especificó el tipo de contenido'}, 400
+
+            if not self.has_role('admin', current_user) and not self.has_role('processing', current_user):
+                return {'msg': 'No tiene permisos suficientes'}, 401
+            
+            task = self.anom.delay(body, current_user)
+            self.add_task_to_user(task.id, 'anonimizacionJep.anomgenerate', current_user, 'msg')
+            
+            return {'msg': 'Se agregó la tarea a la fila de procesamientos'}, 201
+        
     @shared_task(ignore_result=False, name='anonimizacionJep.bulk')
     def bulk(body, user):
-
-        # función para obtener el numero de la palabra en el texto dado un inicio y un fin en caracteres. Si hay dos palabras dentro del mismo rango, se devuelven las dos en una lista, si no, se devuelve una sola palabra en una lista. Si no hay palabras en el rango, se devuelve una lista vacía.
         def get_word_number(text, start, end):
             words = text.split()
             word_numbers = []
@@ -163,6 +178,39 @@ plugin_info = {
                 'id': 'overwrite',
                 'default': False,
                 'required': False,
+            }
+        ],
+        'settings_detail': [
+            {
+                'type': 'radio',
+                'label': 'Entidades nombradas a extraer',
+                'id': 'type',
+                'default': 'anom',
+                'required': True,
+                'options': [
+                    {
+                        'label': 'Personas',
+                        'value': 'PER'
+                    },
+                    {
+                        'label': 'Organizaciones',
+                        'value': 'ORG'
+                    },
+                    {
+                        'label': 'Lugares',
+                        'value': 'LOC'
+                    },
+                    {
+                        'label': 'Fechas',
+                        'value': 'DATE'
+                    }
+                ]
+            },
+            {
+                'type': 'button',
+                'label': 'Generar versión anonimizada',
+                'id': 'generate',
+                'callback': 'anomgenerate'
             }
         ]
     }
