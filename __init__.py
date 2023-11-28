@@ -182,11 +182,9 @@ plugin_info = {
         ],
         'settings_detail': [
             {
-                'type': 'radio',
+                'type': 'multicheckbox',
                 'label': 'Entidades nombradas a extraer',
                 'id': 'type',
-                'default': 'anom',
-                'required': True,
                 'options': [
                     {
                         'label': 'Personas',
