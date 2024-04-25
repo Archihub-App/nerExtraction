@@ -17,7 +17,7 @@ WEB_FILES_PATH = os.environ.get('WEB_FILES_PATH', '')
 ORIGINAL_FILES_PATH = os.environ.get('ORIGINAL_FILES_PATH', '')
 USER_FILES_PATH = os.environ.get('USER_FILES_PATH', '')
 plugin_path = os.path.dirname(os.path.abspath(__file__))
-models_path = plugin_path + '/models'
+models_path = os.path.join(plugin_path + 'models')
 
 class ExtendedPluginClass(PluginClass):
     def __init__(self, path, import_name, name, description, version, author, type, settings):
@@ -257,8 +257,8 @@ class ExtendedPluginClass(PluginClass):
         return '/' + user + '/nerExtractionAnom/' + file_id + '.pdf'
 
 plugin_info = {
-    'name': 'Extracción y anonimización de entidades en documentos PDF',
-    'description': 'Plugin para extraer entidades nombradas y generar una versión anonimizada de un texto en un documento PDF.',
+    'name': 'Extracción y anonimización de entidades nombradas en documentos PDF',
+    'description': 'Plugin para extraer entidades nombradas y generar una versión anonimizada de un texto en un documento PDF. Es necesario tener OCR del documento.',
     'version': '0.1',
     'author': 'Néstor Andrés Peña',
     'type': ['bulk'],
